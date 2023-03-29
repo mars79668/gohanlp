@@ -4,11 +4,12 @@ package hanlp
 
 // HanReq hanlp
 type HanReq struct {
-	Text      string   `json:"text,omitempty"`
-	Language  string   `json:"language,omitempty"` // (zh,mnt)
-	Tokens    []string `json:"tokens,omitempty"`
-	Tasks     []string `json:"tasks,omitempty"`
-	SkipTasks []string `json:"skip_tasks"`
+	Text      interface{} `json:"text,omitempty"`
+	Language  string      `json:"language,omitempty"` // (zh,mnt)
+	Tokens    []string    `json:"tokens,omitempty"`
+	Tasks     []string    `json:"tasks,omitempty"`
+	SkipTasks []string    `json:"skip_tasks"`
+	Topk      int         `json:"topk"`
 }
 
 // HanResp hanlp 返回参数

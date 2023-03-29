@@ -8,6 +8,7 @@ import (
 type Options struct {
 	URL       string
 	Auth      string
+	Topk      int
 	Language  string
 	Timeout   time.Time
 	Tasks     []string
@@ -30,6 +31,12 @@ func WithURL(url string) Option {
 func WithAuth(auth string) Option {
 	return func(o *Options) {
 		o.Auth = auth
+	}
+}
+
+func WithTopk(tk int) Option {
+	return func(o *Options) {
+		o.Topk = tk
 	}
 }
 
