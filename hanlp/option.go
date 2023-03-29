@@ -61,6 +61,23 @@ func WithTasks(tasks ...string) Option {
 	}
 }
 
+func PosPku() Option {
+	return func(o *Options) {
+		o.Tasks = append(o.Tasks, "pos/pku")
+	}
+}
+
+func PosCtb() Option {
+	return func(o *Options) {
+		o.Tasks = append(o.Tasks, "pos/ctb")
+	}
+}
+func Pos863() Option {
+	return func(o *Options) {
+		o.Tasks = append(o.Tasks, "pos/863")
+	}
+}
+
 // WithSkipTasks set skip tasks list("tok","ud","ner","srl","sdp/dm","sdp/pas","sdp/psd","con")
 func WithSkipTasks(skipTasks ...string) Option {
 	return func(o *Options) {

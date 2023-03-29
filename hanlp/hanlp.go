@@ -87,6 +87,29 @@ func (h *hanlp) Parse(text []string, opts ...Option) (string, error) {
 	return h.post("/parse", req, getHeader(options))
 }
 
+/*
+Grammatical Error Correction (GEC) is the task of correcting different kinds of errors in text such as
+
+	spelling, punctuation, grammatical, and word choice errors.
+
+	Args:
+	    text: Text potentially containing different kinds of errors such as spelling, punctuation,
+	        grammatical, and word choice errors.
+	    language: The language of input text. ``None`` to use the default language.
+
+	Returns:
+	    Corrected text.
+
+	Examples::
+
+	    HanLP.grammatical_error_correction(['每个青年都应当有远大的报复。',
+	                                        '有的同学对语言很兴趣。'])
+	    # Output:
+	    [
+	        '每个青年都应当有远大的抱负。',
+	        '有的同学对语言很有兴趣。'
+	    ]
+*/
 func (h *hanlp) GrammaticalErrorCorrection(text []string, opts ...Option) (string, error) {
 	options := h.opts
 	for _, f := range opts { // option
@@ -101,6 +124,27 @@ func (h *hanlp) GrammaticalErrorCorrection(text []string, opts ...Option) (strin
 	return h.post("/grammatical_error_correction", req, getHeader(options))
 }
 
+/*
+Keyphrase extraction aims to identify keywords or phrases reflecting the main topics of a document.
+
+	Args:
+	    text: The text content of the document. Preferably the concatenation of the title and the content.
+	    topk: The number of top-K ranked keywords or keyphrases.
+	    language: The language of input text or tokens. ``None`` to use the default language on server.
+
+	Returns:
+	    A dictionary containing each keyword or keyphrase and its ranking score :math:`s`, :math:`s \in [0, 1]`.
+
+	Examples::
+
+	    HanLP.keyphrase_extraction(
+	        '自然语言处理是一门博大精深的学科，掌握理论才能发挥出HanLP的全部性能。 '
+	        '《自然语言处理入门》是一本配套HanLP的NLP入门书，助你零起点上手自然语言处理。', topk=3)
+	    # Output:
+	    {'自然语言处理': 0.800000011920929,
+	     'HanLP的全部性能': 0.5258446335792542,
+	     '一门博大精深的学科': 0.421421080827713}
+*/
 func (h *hanlp) KeyphraseExtraction(text string, opts ...Option) (string, error) {
 	options := h.opts
 	for _, f := range opts { // option
@@ -118,6 +162,49 @@ func (h *hanlp) KeyphraseExtraction(text string, opts ...Option) (string, error)
 	}
 
 	return h.post("/keyphrase_extraction", req, getHeader(options))
+}
+
+/*
+Semantic textual similarity deals with determining how similar two pieces of texts are.
+
+	Args:
+	    text: A pair or pairs of text.
+	    language: The language of input text. ``None`` to use the default language.
+
+	Returns:
+	    Similarities.
+
+	Examples::
+
+	    HanLP.semantic_textual_similarity([
+	        ('看图猜一电影名', '看图猜电影'),
+	        ('无线路由器怎么无线上网', '无线上网卡和无线路由器怎么用'),
+	        ('北京到上海的动车票', '上海到北京的动车票'),
+	    ])
+	    # Output:
+	    [
+	        0.9764469, # Similarity of ('看图猜一电影名', '看图猜电影')
+	        0.0,       # Similarity of ('无线路由器怎么无线上网', '无线上网卡和无线路由器怎么用')
+	        0.0034587  # Similarity of ('北京到上海的动车票', '上海到北京的动车票')
+	    ]
+*/
+func (h *hanlp) SemanticTextualSimilarity(text [][]string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+
+	if options.Topk == 0 {
+		options.Topk = 10
+	}
+
+	req := &HanReq{
+		Text:     text,
+		Language: options.Language, // (zh,mnt)
+		Topk:     options.Topk,
+	}
+
+	return h.post("/semantic_textual_similarity", req, getHeader(options))
 }
 
 func (h *hanlp) post(uri string, hreq *HanReq, header http.Header) (string, error) {
