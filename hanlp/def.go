@@ -9,7 +9,9 @@ type HanReq struct {
 	Tokens    []string    `json:"tokens,omitempty"`
 	Tasks     []string    `json:"tasks,omitempty"`
 	SkipTasks []string    `json:"skip_tasks"`
-	Topk      int         `json:"topk"`
+	Topk      interface{} `json:"topk"`
+	Prob      bool        `json:"prob"`
+	Model     string      `json:"model"`
 }
 
 // HanResp hanlp 返回参数

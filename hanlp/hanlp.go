@@ -31,6 +31,7 @@ func HanLPClient(opts ...Option) *hanlp {
 }
 
 /*
+分词，词性标注 。。。
 Parse a piece of text.
 
 	Args:
@@ -88,6 +89,7 @@ func (h *hanlp) Parse(text []string, opts ...Option) (string, error) {
 }
 
 /*
+文本纠错
 Grammatical Error Correction (GEC) is the task of correcting different kinds of errors in text such as
 
 	spelling, punctuation, grammatical, and word choice errors.
@@ -125,6 +127,7 @@ func (h *hanlp) GrammaticalErrorCorrection(text []string, opts ...Option) (strin
 }
 
 /*
+关键词提取
 Keyphrase extraction aims to identify keywords or phrases reflecting the main topics of a document.
 
 	Args:
@@ -165,6 +168,7 @@ func (h *hanlp) KeyphraseExtraction(text string, opts ...Option) (string, error)
 }
 
 /*
+相似度分析
 Semantic textual similarity deals with determining how similar two pieces of texts are.
 
 	Args:
@@ -205,6 +209,82 @@ func (h *hanlp) SemanticTextualSimilarity(text [][]string, opts ...Option) (stri
 	}
 
 	return h.post("/semantic_textual_similarity", req, getHeader(options))
+}
+
+/*
+文本分类
+Text classification is the task of assigning a sentence or document an appropriate category.
+
+	The categories depend on the chosen dataset and can range from topics.
+
+	Args:
+	    text: A document or a list of documents.
+	    model: The model to use for prediction.
+	    topk: ``True`` or ``int`` to return the top-k labels.
+	    prob: Return also probabilities.
+
+	Returns:
+
+	    Classification results.
+*/
+func (h *hanlp) TextClassification(text []string, model string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+	if model == "" {
+		model = "news_zh"
+	}
+
+	req := &HanReq{
+		Text:     text,
+		Language: options.Language, // (zh,mnt)
+		Topk:     false,
+		Model:    model,
+	}
+
+	return h.post("/text_classification", req, getHeader(options))
+}
+
+/*
+情感分析
+Sentiment analysis is the task of classifying the polarity of a given text. For instance,
+
+	a text-based tweet can be categorized into either "positive", "negative", or "neutral".
+
+	Args:
+	    text: A document or a list of documents.
+	    language (str): The default language for each :func:`~hanlp_restful.HanLPClient.parse` call.
+	        Contact the service provider for the list of languages supported.
+	        Conventionally, ``zh`` is used for Chinese and ``mul`` for multilingual.
+	        Leave ``None`` to use the default language on server.
+
+	Returns:
+
+	    Sentiment polarity as a numerical value which measures how positive the sentiment is.
+
+	Examples::
+
+	    HanLP.language_identification('''“这是一部男人必看的电影。”人人都这么说。但单纯从性别区分，就会让这电影变狭隘。
+	    《肖申克的救赎》突破了男人电影的局限，通篇几乎充满令人难以置信的温馨基调，而电影里最伟大的主题是“希望”。
+	    当我们无奈地遇到了如同肖申克一般囚禁了心灵自由的那种囹圄，我们是无奈的老布鲁克，灰心的瑞德，还是智慧的安迪？
+	    运用智慧，信任希望，并且勇敢面对恐惧心理，去打败它？
+	    经典的电影之所以经典，因为他们都在做同一件事——让你从不同的角度来欣赏希望的美好。''')
+	    0.9505730271339417
+*/
+func (h *hanlp) SentimentAnalysis(text []string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+
+	req := &HanReq{
+		Text:     text,
+		Language: options.Language, // (zh,mnt)
+		Topk:     false,
+	}
+
+	return h.post("/sentiment_analysis", req, getHeader(options))
 }
 
 func (h *hanlp) post(uri string, hreq *HanReq, header http.Header) (string, error) {
