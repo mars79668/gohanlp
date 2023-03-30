@@ -85,7 +85,7 @@ func (h *hanlp) Parse(text []string, opts ...Option) (string, error) {
 		SkipTasks: options.SkipTasks,
 	}
 
-	return h.post("/parse", req, getHeader(options))
+	return h.Post("/parse", req, getHeader(options))
 }
 
 /*
@@ -123,7 +123,7 @@ func (h *hanlp) GrammaticalErrorCorrection(text []string, opts ...Option) (strin
 		Language: options.Language, // (zh,mnt)
 	}
 
-	return h.post("/grammatical_error_correction", req, getHeader(options))
+	return h.Post("/grammatical_error_correction", req, getHeader(options))
 }
 
 /*
@@ -164,7 +164,7 @@ func (h *hanlp) KeyphraseExtraction(text string, opts ...Option) (string, error)
 		Topk:     options.Topk,
 	}
 
-	return h.post("/keyphrase_extraction", req, getHeader(options))
+	return h.Post("/keyphrase_extraction", req, getHeader(options))
 }
 
 /*
@@ -208,7 +208,7 @@ func (h *hanlp) SemanticTextualSimilarity(text [][]string, opts ...Option) (stri
 		Topk:     options.Topk,
 	}
 
-	return h.post("/semantic_textual_similarity", req, getHeader(options))
+	return h.Post("/semantic_textual_similarity", req, getHeader(options))
 }
 
 /*
@@ -243,7 +243,7 @@ func (h *hanlp) TextClassification(text []string, model string, opts ...Option) 
 		Model:    model,
 	}
 
-	return h.post("/text_classification", req, getHeader(options))
+	return h.Post("/text_classification", req, getHeader(options))
 }
 
 /*
@@ -284,7 +284,7 @@ func (h *hanlp) SentimentAnalysis(text []string, opts ...Option) (string, error)
 		Topk:     false,
 	}
 
-	return h.post("/sentiment_analysis", req, getHeader(options))
+	return h.Post("/sentiment_analysis", req, getHeader(options))
 }
 
 /*
@@ -323,7 +323,7 @@ func (h *hanlp) AbstractiveSummarization(text string, opts ...Option) (string, e
 
 	}
 
-	return h.post("/abstractive_summarization", req, getHeader(options))
+	return h.Post("/abstractive_summarization", req, getHeader(options))
 }
 
 /*
@@ -372,7 +372,7 @@ func (h *hanlp) ExtractiveSummarization(text string, opts ...Option) (string, er
 		Topk:     options.Topk,
 	}
 
-	return h.post("/extractive_summarization", req, getHeader(options))
+	return h.Post("/extractive_summarization", req, getHeader(options))
 }
 
 /*
@@ -418,10 +418,10 @@ func (h *hanlp) TextStyleTransfer(text []string, style string, opts ...Option) (
 		TargetStyle: style,
 	}
 
-	return h.post("/text_style_transfer", req, getHeader(options))
+	return h.Post("/text_style_transfer", req, getHeader(options))
 }
 
-func (h *hanlp) post(uri string, hreq *HanReq, header http.Header) (string, error) {
+func (h *hanlp) Post(uri string, hreq *HanReq, header http.Header) (string, error) {
 	resp, err := req.Post(h.opts.URL+uri, req.BodyJSON(hreq), header)
 	if err != nil {
 		return "", err
@@ -434,7 +434,7 @@ func (h *hanlp) post(uri string, hreq *HanReq, header http.Header) (string, erro
 	return resp.ToString()
 }
 
-func (h *hanlp) postObj(uri string, hreq *HanReq, header http.Header) (*HanResp, error) {
+func (h *hanlp) PostObj(uri string, hreq *HanReq, header http.Header) (*HanResp, error) {
 	resp, err := req.Post(h.opts.URL+uri, req.BodyJSON(hreq), header)
 	if err != nil {
 		return nil, err
@@ -452,7 +452,7 @@ func (h *hanlp) postObj(uri string, hreq *HanReq, header http.Header) (*HanResp,
 	return UnmarshalHanResp(b)
 }
 
-func (h *hanlp) get(uri string, header http.Header) (string, error) {
+func (h *hanlp) Get(uri string, header http.Header) (string, error) {
 	resp, err := req.Get(h.opts.URL+uri, header)
 	if err != nil {
 		return "", err
@@ -471,7 +471,7 @@ func (h *hanlp) About(opts ...Option) (string, error) {
 		f(&options)
 	}
 
-	b, err := h.get("/about", getHeader(options))
+	b, err := h.Get("/about", getHeader(options))
 	if err != nil {
 		mylog.Error(err)
 		return "", err
@@ -494,7 +494,7 @@ func (h *hanlp) ParseObj(text []string, opts ...Option) (*HanResp, error) {
 		SkipTasks: options.SkipTasks,
 	}
 
-	return h.postObj("/parse", req, getHeader(options))
+	return h.PostObj("/parse", req, getHeader(options))
 }
 
 // ParseAny parse any request parms
@@ -515,7 +515,7 @@ func (h *hanlp) ParseAny(text []string, resp interface{}, opts ...Option) error 
 		Tasks:     options.Tasks,
 		SkipTasks: options.SkipTasks,
 	}
-	b, err := h.post("/parse", req, getHeader(options))
+	b, err := h.Post("/parse", req, getHeader(options))
 	if err != nil {
 		return err
 	}
