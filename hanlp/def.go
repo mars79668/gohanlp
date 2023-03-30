@@ -4,14 +4,15 @@ package hanlp
 
 // HanReq hanlp
 type HanReq struct {
-	Text      interface{} `json:"text,omitempty"`
-	Language  string      `json:"language,omitempty"` // (zh,mnt)
-	Tokens    []string    `json:"tokens,omitempty"`
-	Tasks     []string    `json:"tasks,omitempty"`
-	SkipTasks []string    `json:"skip_tasks"`
-	Topk      interface{} `json:"topk"`
-	Prob      bool        `json:"prob"`
-	Model     string      `json:"model"`
+	Text        interface{} `json:"text,omitempty"`
+	Language    string      `json:"language,omitempty"` // (zh,mnt)
+	Tokens      []string    `json:"tokens,omitempty"`
+	Tasks       []string    `json:"tasks,omitempty"`
+	SkipTasks   []string    `json:"skip_tasks,omitempty"`
+	Topk        interface{} `json:"topk,omitempty"`
+	Prob        bool        `json:"prob,omitempty"`
+	Model       string      `json:"model,omitempty"`
+	TargetStyle string      `json:"target_style,omitempty"`
 }
 
 // HanResp hanlp 返回参数

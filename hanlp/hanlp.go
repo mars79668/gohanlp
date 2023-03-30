@@ -287,6 +287,140 @@ func (h *hanlp) SentimentAnalysis(text []string, opts ...Option) (string, error)
 	return h.post("/sentiment_analysis", req, getHeader(options))
 }
 
+/*
+生成式自动摘要
+Abstractive Summarization is the task of generating a short and concise summary that captures the
+
+	salient ideas of the source text. The generated summaries potentially contain new phrases and sentences that
+	may not appear in the source text.
+
+	Args:
+	    text: The text content of the document.
+	    language: The language of input text or tokens. ``None`` to use the default language on server.
+
+	Returns:
+	    Summarization.
+
+	Examples::
+
+	    HanLP.abstractive_summarization('''
+	    每经AI快讯，2月4日，长江证券研究所金属行业首席分析师王鹤涛表示，2023年海外经济衰退，美债现处于历史高位，
+	    黄金的趋势是值得关注的；在国内需求修复的过程中，看好大金属品种中的铜铝钢。
+	    此外，在细分的小品种里，建议关注两条主线，一是新能源，比如锂、钴、镍、稀土，二是专精特新主线。（央视财经）
+	    ''')
+	    # Output:
+	    '长江证券：看好大金属品种中的铜铝钢'
+*/
+func (h *hanlp) AbstractiveSummarization(text string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+
+	req := &HanReq{
+		Text:     text,
+		Language: options.Language, // (zh,mnt)
+
+	}
+
+	return h.post("/abstractive_summarization", req, getHeader(options))
+}
+
+/*
+抽取式自动摘要
+Single document summarization is the task of selecting a subset of the sentences which best
+
+	represents a summary of the document, with a balance of salience and redundancy.
+
+	Args:
+	    text: The text content of the document.
+	    topk: The maximum number of top-K ranked sentences. Note that due to Trigram Blocking tricks, the actual
+	        number of returned sentences could be less than ``topk``.
+	    language: The language of input text or tokens. ``None`` to use the default language on server.
+
+	Returns:
+	    A dictionary containing each sentence and its ranking score :math:`s \in [0, 1]`.
+
+	Examples::
+
+	    HanLP.extractive_summarization('''
+	    据DigiTimes报道，在上海疫情趋缓，防疫管控开始放松后，苹果供应商广达正在逐步恢复其中国工厂的MacBook产品生产。
+	    据供应链消息人士称，生产厂的订单拉动情况正在慢慢转强，这会提高MacBook Pro机型的供应量，并缩短苹果客户在过去几周所经历的延长交货时间。
+	    仍有许多苹果笔记本用户在等待3月和4月订购的MacBook Pro机型到货，由于苹果的供应问题，他们的发货时间被大大推迟了。
+	    据分析师郭明錤表示，广达是高端MacBook Pro的唯一供应商，自防疫封控依赖，MacBook Pro大部分型号交货时间增加了三到五周，
+	    一些高端定制型号的MacBook Pro配置要到6月底到7月初才能交货。
+	    尽管MacBook Pro的生产逐渐恢复，但供应问题预计依然影响2022年第三季度的产品销售。
+	    苹果上周表示，防疫措施和元部件短缺将继续使其难以生产足够的产品来满足消费者的强劲需求，这最终将影响苹果6月份的收入。
+	    ''')
+	    # Output:
+	    {'据DigiTimes报道，在上海疫情趋缓，防疫管控开始放松后，苹果供应商广达正在逐步恢复其中国工厂的MacBook产品生产。': 0.9999,
+	     '仍有许多苹果笔记本用户在等待3月和4月订购的MacBook Pro机型到货，由于苹果的供应问题，他们的发货时间被大大推迟了。': 0.5800,
+	     '尽管MacBook Pro的生产逐渐恢复，但供应问题预计依然影响2022年第三季度的产品销售。': 0.5422}
+*/
+func (h *hanlp) ExtractiveSummarization(text string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+
+	if options.Topk == 0 {
+		options.Topk = 3
+	}
+	req := &HanReq{
+		Text:     text,
+		Language: options.Language, // (zh,mnt)
+		Topk:     options.Topk,
+	}
+
+	return h.post("/extractive_summarization", req, getHeader(options))
+}
+
+/*
+Text style transfer aims to change the style of the input text to the target style while preserving its
+
+	content.
+
+	Args:
+	    text: Source text.
+	    target_style: Target style.
+	    language: The language of input text. ``None`` to use the default language.
+
+	Returns:
+	    Text or a list of text of the target style.
+
+	Examples::
+
+	    HanLP.text_style_transfer(['国家对中石油抱有很大的期望.', '要用创新去推动高质量的发展。'],
+	                              target_style='gov_doc')
+	    # Output:
+	    [
+	        '国家对中石油寄予厚望。',
+	        '要以创新驱动高质量发展。'
+	    ]
+
+	    HanLP.text_style_transfer('我看到了窗户外面有白色的云和绿色的森林',
+	                              target_style='modern_poetry')
+	    # Output:
+	    '我看见窗外的白云绿林'
+*/
+func (h *hanlp) TextStyleTransfer(text []string, style string, opts ...Option) (string, error) {
+	options := h.opts
+	for _, f := range opts { // option
+		f(&options)
+	}
+
+	if len(style) == 0 {
+		style = "modern_poetry"
+	}
+	req := &HanReq{
+		Text:        text,
+		Language:    options.Language, // (zh,mnt)
+		TargetStyle: style,
+	}
+
+	return h.post("/text_style_transfer", req, getHeader(options))
+}
+
 func (h *hanlp) post(uri string, hreq *HanReq, header http.Header) (string, error) {
 	resp, err := req.Post(h.opts.URL+uri, req.BodyJSON(hreq), header)
 	if err != nil {
